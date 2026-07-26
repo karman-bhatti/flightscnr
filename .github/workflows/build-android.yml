@@ -9,7 +9,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout Source Code
@@ -36,6 +38,7 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev \
+            libunwind-dev \
             libgstreamer1.0-dev \
             gstreamer1.0-plugins-base \
             gstreamer1.0-plugins-good \
@@ -51,6 +54,7 @@ jobs:
             libreadline-dev \
             libncursesw5-dev \
             libffi-dev \
+            libtool \
             uuid-dev \
             tar \
             unzip \
