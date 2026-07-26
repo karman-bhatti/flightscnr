@@ -97,15 +97,19 @@ def _ensure_env_credentials() -> None:
 # Inject credentials before importing fr24
 _ensure_env_credentials()
 
-from fr24 import FR24, BoundingBox  # noqa: E402
-from fr24.proto._live_feed_pb2 import (  # noqa: E402
-    LiveFeedRequest, LiveFeedResponse, LocationBoundaries,
-    VisibilitySettings, Filter, AirportFilter,
-)
-from fr24.proto._common_pb2 import TrafficType, RestrictionVisibility  # noqa: E402
-from fr24.grpc import live_feed as _grpc_live_feed  # noqa: E402
-from fr24.proto import parse_data as _parse_data  # noqa: E402
-from google.protobuf.field_mask_pb2 import FieldMask  # noqa: E402
+try:
+    from fr24 import FR24, BoundingBox  # noqa: E402
+    from fr24.proto._live_feed_pb2 import (  # noqa: E402
+        LiveFeedRequest, LiveFeedResponse, LocationBoundaries,
+        VisibilitySettings, Filter, AirportFilter,
+    )
+    from fr24.proto._common_pb2 import TrafficType, RestrictionVisibility  # noqa: E402
+    from fr24.grpc import live_feed as _grpc_live_feed  # noqa: E402
+    from fr24.proto import parse_data as _parse_data  # noqa: E402
+    from google.protobuf.field_mask_pb2 import FieldMask  # noqa: E402
+    HAS_FR24 = True
+except ImportError:
+    HAS_FR24 = False
 
 # Force-import h2 early so httpx HTTP/2 works reliably under systemd.
 try:
@@ -215,6 +219,8 @@ class FR24Client:
         2. No resource leaks (__aexit__ always called)
         3. Fresh connections each cycle (no stale HTTP/2 streams)
         """
+        if not HAS_FR24:
+            raise RuntimeError("FR24 SDK is not installed on this device — running in adsb.fi-only mode")
         loop = asyncio.new_event_loop()
         try:
             async def _wrapper():

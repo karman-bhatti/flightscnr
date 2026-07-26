@@ -27,12 +27,11 @@ class TestDisplayRotation(unittest.TestCase):
     def test_to_logical_corners(self):
         from display.round_touch import rotation, theme
 
-        side = theme.SIZE
         cases = {
             0: ((10, 20), (10, 20)),
-            90: ((10, 20), (20, side - 1 - 10)),
-            180: ((10, 20), (side - 1 - 10, side - 1 - 20)),
-            270: ((10, 20), (side - 1 - 20, 10)),
+            90: ((10, 20), (20, theme.HEIGHT - 1 - 10)),
+            180: ((10, 20), (theme.WIDTH - 1 - 10, theme.HEIGHT - 1 - 20)),
+            270: ((10, 20), (theme.WIDTH - 1 - 20, 10)),
         }
         for deg, (phys, expected) in cases.items():
             with self.subTest(deg=deg):
