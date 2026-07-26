@@ -1,0 +1,3 @@
+# Allow the repo owner to run portal updates without a password.
+# Installed by install-pi.sh as /etc/sudoers.d/flightscnr-update
+__REPO_OWNER__ ALL=(root) NOPASSWD: __UPDATE_SCRIPT__

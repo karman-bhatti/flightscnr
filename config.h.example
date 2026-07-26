@@ -1,0 +1,54 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FlightScnr Pi — API keys & home location (template)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// On first install, install-pi.sh copies this file to config.h (if missing).
+// Edit config.h with any text editor, save, then restart:
+//   sudo systemctl restart flightscnr
+//
+// You can also set keys from the web portal at http://raspberrypi.local
+// (saved to /var/lib/flightscnr/secrets.json).
+//
+// Priority (highest wins): /etc/flightscnr.env → web portal → config.h
+//
+// Lines starting with // are comments.
+
+// FlightRadar24 subscription (format: subscription_key|jwt_token)
+FR24_API_KEY =
+
+// Tomorrow.io weather — https://www.tomorrow.io/weather-api/
+TOMORROW_API_KEY =
+
+// Optional — schedule lookup when a flight is not airborne yet
+// AIRLABS_API_KEY =
+// Optional FlightAware AeroAPI key (route fallback only — not live radar)
+// FLIGHTAWARE_API_KEY =
+// Optional local dump1090/readsb aircraft.json feed
+// DUMP1090_ENABLED = False
+// DUMP1090_URL = http://127.0.0.1:8080/data/aircraft.json
+
+// Optional — aisstream.io AIS vessels (https://aisstream.io — free, non-commercial)
+// AISSTREAM_API_KEY =
+
+// Optional — NASA FIRMS MAP_KEY for wildfires outside California
+// (In California the radar uses CAL FIRE incidents — no key required)
+// FIRMS_MAP_KEY =
+
+// Radar center (or set location in the web portal)
+HOME_LAT = 37.619664
+HOME_LON = -122.372035
+
+// Flight detail: airline logo when no planespotters photo (True/False)
+SHOW_AIRLINE_LOGOS = False
+
+// AIS vessel radar declutter
+// One-line name only (no type/speed); never label with MMSI
+VESSEL_SHORT_TAGS = True
+// Hide anchored/moored / near-zero SOG vessels from the radar
+VESSEL_HIDE_PARKED = True
+// Dim parked icons; brighter moving hulls (when parked are shown)
+VESSEL_HIERARCHY = True
+// Label policy: all_labels | moving_only | icons_only
+VESSEL_DENSITY_MODE = moving_only
+// SOG below this (knots) counts as parked when nav status is unknown
+VESSEL_PARKED_SOG_KT = 0.5

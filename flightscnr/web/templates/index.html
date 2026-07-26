@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FlightScnrPi Settings</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <style>
+        :root{--bg:#0a0a0a;--card:#141414;--card2:#1c1c1c;--line:#333;--text:#ececec;
+        --muted:#9a9a9a;--accent:#1a9c3c;--accent2:#22c24c;--field:#1e1e1e;--fline:#3a3a3a;--link:#cfcfcf;}
+        *{box-sizing:border-box;}
+        body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:var(--bg);
+        color:var(--text);line-height:1.45;padding-bottom:1.2rem;}
+        .wrap{max-width:34rem;margin:0 auto;padding:1.25rem 1rem;}
+        .app-head{display:flex;align-items:center;gap:.65rem;margin-bottom:.25rem;}
+        .logo{width:2.1rem;height:2.1rem;border-radius:50%;flex:none;border:1px solid #0a5;
+        background:radial-gradient(circle at 50% 50%,#0c2,#063 70%,#021 100%);}
+        h1{font-size:1.3rem;margin:0;}
+        .subtitle{color:var(--muted);font-size:.85rem;margin:.15rem 0 1.1rem;}
+        .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 0 .9rem;overflow:hidden;}
+        .card>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.6rem;
+        padding:.85rem 1rem;font-weight:600;font-size:.98rem;user-select:none;}
+        .card>summary::-webkit-details-marker{display:none;}
+        .card>summary .ico{width:1.6rem;height:1.6rem;border-radius:7px;flex:none;display:grid;
+        place-items:center;font-size:.95rem;background:var(--card2);border:1px solid var(--line);}
+        .card>summary .chev{margin-left:auto;color:var(--muted);transition:transform .18s;font-size:.8rem;}
+        .card[open]>summary .chev{transform:rotate(90deg);}
+        .card>summary .sum{color:var(--muted);font-weight:400;font-size:.78rem;margin-left:.1rem;}
+        .card .body{padding:.25rem 1rem 1rem;border-top:1px solid var(--line);}
+        label{display:block;margin:.85rem 0 .3rem;font-size:.84rem;color:#d2d2d2;}
+        input,select,button{font-family:inherit;}
+        input,select{width:100%;padding:.6rem .65rem;border-radius:9px;border:1px solid var(--fline);
+        background:var(--field);color:#fff;font-size:1rem;outline:none;}
+        input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(34,194,76,.2);}
+        input::placeholder{color:#777;}
+        .hint,.note{color:var(--muted);font-size:.78rem;margin:.4rem 0 0;}
+        .status{margin-top:.55rem;font-size:.78rem;color:#9fbfa7;display:none}
+        .status.error{color:#ff9d9d}
+        .status.show{display:block}
+        .row2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+        .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;}
+        @media(max-width:24rem){.row2,.row3{grid-template-columns:1fr;}}
+        .track-row{display:flex;gap:.5rem;align-items:center}
+        .track-row input{flex:1}
+        .track-row button,.btn{
+          padding:.62rem .8rem;border-radius:9px;border:1px solid var(--fline);
+          background:var(--card2);color:#fff;cursor:pointer;font-size:.88rem
+        }
+        .btn-primary{background:var(--accent);border-color:var(--accent2)}
+        .btn:disabled{opacity:.6;cursor:wait}
+        .chk{display:flex;align-items:center;gap:.6rem;padding:.7rem 0;border-bottom:1px solid rgba(120,120,120,.22);}
+        .chk:last-of-type{border-bottom:none;}
+        .chk label{margin:0;font-size:.9rem;color:var(--text);flex:1;}
+        .switch{position:relative;width:2.6rem;height:1.5rem;flex:none;}
+        .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
+        .switch .track{position:absolute;inset:0;border-radius:999px;background:#333;
+        border:1px solid var(--fline);transition:.18s;pointer-events:none;}
+        .switch .track::after{content:"";position:absolute;top:50%;left:.18rem;transform:translateY(-50%);
+        width:1.05rem;height:1.05rem;border-radius:50%;background:#9a9a9a;transition:.18s;}
+        .switch input:checked + .track{background:var(--accent);border-color:var(--accent2);}
+        .switch input:checked + .track::after{left:1.32rem;background:#fff;}
+        a{color:var(--link);}
+        .wifi-note,.foot{text-align:center;font-size:.8rem;color:var(--muted);}
+        .wifi-note{margin-top:.6rem}
+        .foot{margin:1rem 0 .2rem}
+        .update-card .body{padding-top:.75rem}
+        .update-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.35rem 0 .6rem}
+        .update-badge{display:inline-block;padding:.2rem .55rem;border-radius:999px;font-size:.75rem;
+        font-weight:600;background:#3a2808;color:#ffc866;border:1px solid #6a4a12}
+        .update-badge.ok{background:#0f2a18;color:#8dffb0;border-color:#1a9c3c}
+        .update-ver{font-size:.82rem;color:var(--muted);margin:.15rem 0}
+        .btn-danger{background:#4a1515;border-color:#7a2222}
+        .btn-danger:hover{background:#5c1a1a}
+        .system-card .body{padding-top:.75rem}
+        .hidden{display:none}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="app-head"><div class="logo"></div><h1>FlightScnrPi</h1></div>
+    <p class="subtitle">Portal settings for radar, local ADS-B, display, alerts, tracking, and API keys.</p>
+
+    <details class="card" open>
+        <summary><span class="ico">&#9678;</span>Radar<span class="sum">center, range, units</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <label for="radar_center">Radar center (lat, lon)</label>
+            <input id="radar_center" type="text" autocomplete="off" placeholder="37.620000, -122.370000">
+            <label for="range_index">Range</label>
+            <select id="range_index"></select>
+            <p class="hint">Outer radar range shown as mi / km / nm.</p>
+            <label for="dist_units">Distance units (device labels)</label>
+            <select id="dist_units">
+                <option value="km">kilometers</option>
+                <option value="mi">statute miles</option>
+                <option value="nm">nautical miles</option>
+            </select>
+            <p class="hint">Unit used for range rings and distance text on the Pi display.</p>
+            <label for="min_height">Min altitude floor (ft, 0 = off)</label>
+            <select id="min_height">
+                <option value="0">0 (off)</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+                <option value="1500">1500</option>
+                <option value="2000">2000</option>
+                <option value="2500">2500</option>
+                <option value="3000">3000</option>
+                <option value="3500">3500</option>
+                <option value="4000">4000</option>
+                <option value="4500">4500</option>
+                <option value="5000">5000</option>
+            </select>
+            <label for="max_height">Max altitude ceiling (ft)</label>
+            <select id="max_height">
+                <option value="1000">1000</option>
+                <option value="1500">1500</option>
+                <option value="2000">2000</option>
+                <option value="2500">2500</option>
+                <option value="3000">3000</option>
+                <option value="3500">3500</option>
+                <option value="4000">4000</option>
+                <option value="4500">4500</option>
+                <option value="5000">5000</option>
+                <option value="6000">6000</option>
+                <option value="7000">7000</option>
+                <option value="8000">8000</option>
+                <option value="9000">9000</option>
+                <option value="10000">10000</option>
+                <option value="12000">12000</option>
+                <option value="15000">15000</option>
+                <option value="16000">16000</option>
+                <option value="18000">18000</option>
+                <option value="20000">20000</option>
+                <option value="25000">25000</option>
+                <option value="30000">30000</option>
+                <option value="35000">35000</option>
+                <option value="40000">40000</option>
+                <option value="45000">45000</option>
+                <option value="50000">50000</option>
+                <option value="100000">100000 (off)</option>
+            </select>
+            <p class="hint">Show only aircraft between the floor and ceiling. Max is raised automatically if it would sit below min.</p>
+            <label for="radar_theme">Color theme</label>
+            <select id="radar_theme"></select>
+            <label for="map_style">Map style</label>
+            <select id="map_style">
+                <option value="dark">Dark (CARTO)</option>
+                <option value="light">Light (CARTO)</option>
+                <option value="vfr">VFR sectional (FAA)</option>
+            </select>
+            <p class="hint">VFR sectionals are free public-domain FAA charts (US coverage). Outside the US, use dark or light.</p>
+            <label for="vfr_opacity">VFR map opacity <span id="vfr_opacity_label">45%</span></label>
+            <input id="vfr_opacity" type="range" min="15" max="100" step="1" value="45">
+            <p class="hint">How strong the VFR chart appears under traffic (lower = paler). Applies when map style is VFR.</p>
+            <div class="chk">
+                <label for="show_compass">Show compass rose</label>
+                <span class="switch"><input id="show_compass" type="checkbox"><span class="track"></span></span>
+            </div>
+            <div class="chk">
+                <label for="show_range_rings">Show range rings</label>
+                <span class="switch"><input id="show_range_rings" type="checkbox"><span class="track"></span></span>
+            </div>
+            <div class="chk">
+                <label for="show_aircraft_tag">Show traffic labels</label>
+                <span class="switch"><input id="show_aircraft_tag" type="checkbox"><span class="track"></span></span>
+            </div>
+            <p class="hint">Callsign/type/altitude on aircraft, and vessel name tags. Turn off to declutter a busy radar; tap a symbol for details.</p>
+            <label for="facing_deg">Facing direction (degrees)</label>
+            <input id="facing_deg" type="number" min="0" max="359" step="1" value="0">
+            <p class="hint">Real-world direction at the top of the screen (0 = north, 90 = east, 180 = south, 270 = west). You can also set this on the device under Settings → Display → Facing.</p>
+            <div class="chk">
+                <label for="show_sweep">Show radar sweep line</label>
+                <span class="switch"><input id="show_sweep" type="checkbox"><span class="track"></span></span>
+            </div>
+            <div class="chk">
+                <label for="show_precip">Show precipitation (RainViewer)</label>
+                <span class="switch"><input id="show_precip" type="checkbox"><span class="track"></span></span>
+            </div>
+            <p class="hint">Live rain/snow radar overlay via <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a> (free personal API, updates ~ every 5–10 min).</p>
+            <div class="chk">
+                <label for="show_wildfires">Show wildfires</label>
+                <span class="switch"><input id="show_wildfires" type="checkbox"><span class="track"></span></span>
+            </div>
+            <p class="hint">In California: <a href="https://www.fire.ca.gov/incidents" target="_blank" rel="noopener">CAL FIRE</a> (no API key). Rest of USA/Canada: <a href="https://data-nifc.opendata.arcgis.com/" target="_blank" rel="noopener">NIFC WFIGS</a> / <a href="https://fire.airnow.gov/" target="_blank" rel="noopener">AirNow</a> large fires (no API key). Outside USA/Canada: <a href="https://firms.modaps.eosdis.nasa.gov/api/area/" target="_blank" rel="noopener">NASA FIRMS</a> hotspots (free <a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/" target="_blank" rel="noopener">MAP_KEY</a> in API Keys). Tap a fire for details. Refreshes every 15 minutes and on recenter.</p>
+            <div class="chk">
+                <label for="show_ground_vehicles">Show ground vehicles</label>
+                <span class="switch"><input id="show_ground_vehicles" type="checkbox"><span class="track"></span></span>
+            </div>
+            <p class="hint">Airport ground vehicles (tugs, service vans, ARFF, etc.) when ADS-B reports type codes like GRND/GVEH/SERV. Turn off to declutter the radar near airports.</p>
+            <label for="traffic_mode">Radar traffic</label>
+            <select id="traffic_mode">
+                <option value="aircraft">Aircraft only</option>
+                <option value="marine">Marine (AIS) only</option>
+                <option value="both">Aircraft + marine</option>
+            </select>
+            <p class="hint">Marine needs an aisstream.io API key below. Free for non-commercial use.</p>
+            <button class="btn btn-primary" id="btn-radar" style="margin-top:.7rem" type="button">Save radar settings</button>
+            <div id="radar-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card" open>
+        <summary><span class="ico">&#128225;</span>Local ADS-B<span class="sum">dump1090 / readsb</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <div class="chk">
+                <label for="dump1090_enabled">Use local dump1090 / readsb</label>
+                <span class="switch"><input id="dump1090_enabled" type="checkbox"><span class="track"></span></span>
+            </div>
+            <label for="dump1090_url">aircraft.json URL</label>
+            <input id="dump1090_url" type="text" autocomplete="off" placeholder="http://127.0.0.1:8080/data/aircraft.json">
+            <p class="hint">Local receiver feed (dump1090-fa, readsb, or tar1090). Merges with FR24/adsb.fi; local positions win on overlap. Leave off if nothing is listening — connection refused will spam the logs.</p>
+            <button class="btn btn-primary" id="btn-dump1090" style="margin-top:.7rem" type="button">Save local ADS-B</button>
+            <div id="dump1090-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card" open>
+        <summary><span class="ico">&#9788;</span>Display &amp; screens<span class="sum">brightness, rotation, timeouts</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <label for="bright_pct">Screen brightness <span id="bright_pct_label">100%</span></label>
+            <input id="bright_pct" type="range" min="3" max="100" step="1" value="100">
+            <label for="display_rotation">Screen rotation</label>
+            <select id="display_rotation">
+                <option value="0">0°</option>
+                <option value="90">90° clockwise</option>
+                <option value="180">180°</option>
+                <option value="270">270° clockwise</option>
+            </select>
+            <p class="hint">Rotate the entire UI and touch mapping for how the Pi/panel is mounted. Same as Settings → Display → Rotate on the device.</p>
+            <div class="row2">
+                <div>
+                    <label for="detail_timeout">Flight detail screen timeout</label>
+                    <select id="detail_timeout">
+                        <option value="0">Manual (swipe)</option>
+                        <option value="10">10 seconds</option>
+                        <option value="20">20 seconds</option>
+                        <option value="30">30 seconds</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="clock_timeout">Clock / forecast timeout</label>
+                    <select id="clock_timeout">
+                        <option value="0">Manual (swipe)</option>
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
+                        <option value="15">15 seconds</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chk">
+                <label for="idle_clock">Return to clock when no aircraft visible</label>
+                <span class="switch"><input id="idle_clock" type="checkbox"><span class="track"></span></span>
+            </div>
+            <button class="btn btn-primary" id="btn-display" style="margin-top:.7rem" type="button">Save display settings</button>
+            <button class="btn" id="btn-save-reload" style="margin-top:.55rem" type="button">Save &amp; reload on display</button>
+            <div id="display-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card" open>
+        <summary><span class="ico">&#9790;</span>Off-Hours<span class="sum">night mode schedule</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <div class="chk">
+                <label for="night_en">Enable off-hours (night mode)</label>
+                <span class="switch"><input id="night_en" type="checkbox"><span class="track"></span></span>
+            </div>
+            <label for="night_mode">During off-hours</label>
+            <select id="night_mode">
+                <option value="dim">Dim display</option>
+                <option value="off">Turn off display</option>
+            </select>
+            <div id="dim-row">
+                <label for="night_dim">Dim brightness</label>
+                <select id="night_dim">
+                    <option value="3">3%</option><option value="5">5%</option>
+                    <option value="10">10%</option><option value="15">15%</option><option value="20">20%</option>
+                    <option value="30">30%</option><option value="40">40%</option><option value="50">50%</option>
+                    <option value="100">100% (full)</option>
+                </select>
+            </div>
+            <div class="chk">
+                <label for="night_clock">Show clock during off-hours</label>
+                <span class="switch"><input id="night_clock" type="checkbox"><span class="track"></span></span>
+            </div>
+            <div class="row2">
+                <div><label for="night_start">Start</label><input type="time" id="night_start"></div>
+                <div><label for="night_end">End</label><input type="time" id="night_end"></div>
+            </div>
+            <p class="note">Dim/off and clock can be combined — e.g. dim the display and stay on the clock screen.</p>
+            <button class="btn btn-primary" id="btn-offhours" style="margin-top:.7rem" type="button">Save off-hours</button>
+            <div id="offhours-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card">
+        <summary><span class="ico">&#9729;</span>Weather<span class="sum">units</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <label for="weather_units">Units</label>
+            <select id="weather_units">
+                <option value="metric">Metric (°C)</option>
+                <option value="imperial">Imperial (°F)</option>
+            </select>
+            <button class="btn btn-primary" id="btn-weather" type="button">Save weather units</button>
+            <div id="weather-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card" open>
+        <summary><span class="ico">&#9888;</span>Alerts<span class="sum">aircraft filters</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <div class="chk"><label for="alert-mil">Alert on military aircraft</label><span class="switch"><input id="alert-mil" type="checkbox"><span class="track"></span></span></div>
+            <div class="chk"><label for="alert-emrg">Alert on emergency squawk (7700/7600/7500)</label><span class="switch"><input id="alert-emrg" type="checkbox"><span class="track"></span></span></div>
+            <div class="chk"><label for="alert-hide">Hide non-alerted aircraft on radar</label><span class="switch"><input id="alert-hide" type="checkbox"><span class="track"></span></span></div>
+            <label for="alert-watch">Watch list (callsigns / registrations)</label>
+            <input id="alert-watch" type="text" autocomplete="off" placeholder="UAL123, D-AIML, N2136U">
+            <p class="hint">Many flights to highlight on the local radar when they appear in range — not a dedicated follow. Callsigns (UAL123) or tails (D-AIML, N2136U).</p>
+            <label for="alert-watch-types">Watch list (aircraft types)</label>
+            <input id="alert-watch-types" type="text" autocomplete="off" placeholder="A337, B748, A330-743">
+            <p class="hint">Comma-separated ICAO type codes or designations (e.g. A337, B738, A330-743). Matches every aircraft of that type on radar. Clear either field and Save to remove those watches.</p>
+            <button class="btn btn-primary" id="btn-alerts" style="margin-top:.7rem" type="button">Save alerts</button>
+            <div id="alert-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card">
+        <summary><span class="ico">&#9992;</span>Tracking<span class="sum">follow one flight worldwide</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <label for="callsign-input">Track callsign or registration</label>
+            <div class="track-row">
+                <input type="text" id="callsign-input" placeholder="UAL1134 / N2136U / CS-TPQ" maxlength="12">
+                <button class="btn btn-primary" id="btn-track" type="button">Track</button>
+                <button class="btn" id="btn-clear-track" type="button">Clear</button>
+            </div>
+            <p class="hint">Follow <strong>one</strong> flight worldwide on the Tracked screen (route, ETA, pin) — even outside radar range. Callsign (UAL1134 / DLH3Y) or tail (D-AIML, N2136U).</p>
+            <p class="hint" id="current-tracked">Loading tracked flight...</p>
+            <div id="track-status" class="status"></div>
+            <div class="track-row hidden" id="confirm-row">
+                <button class="btn btn-primary" id="btn-save-anyway" type="button">Save anyway</button>
+                <button class="btn" id="btn-cancel-save" type="button">Cancel</button>
+            </div>
+            <label style="margin-top:1rem;">Route search (live)</label>
+            <div class="row3">
+                <input type="text" id="origin-input" placeholder="SFO" maxlength="4">
+                <input type="text" id="dest-input" placeholder="JFK" maxlength="4">
+                <button class="btn" id="btn-route" type="button">Search</button>
+            </div>
+            <div id="route-results" class="note"></div>
+        </div>
+    </details>
+
+    <details class="card">
+        <summary><span class="ico">&#128273;</span>API Keys<span class="sum">FR24, Tomorrow.io, AirLabs, AIS, FlightAware, FIRMS</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <div class="chk">
+                <label for="use-fr24-api">Use FR24 API</label>
+                <span class="switch"><input id="use-fr24-api" type="checkbox" checked><span class="track"></span></span>
+            </div>
+            <label for="fr24-key">FR24 key</label>
+            <input type="password" id="fr24-key" placeholder="subscription_key|token" autocomplete="off">
+            <p class="hint" id="fr24-hint"></p>
+            <div class="chk">
+                <label for="use-tomorrow-weather">Use Tomorrow.io weather</label>
+                <span class="switch"><input id="use-tomorrow-weather" type="checkbox" checked><span class="track"></span></span>
+            </div>
+            <label for="tomorrow-key">Tomorrow.io key</label>
+            <input type="password" id="tomorrow-key" placeholder="API key" autocomplete="off">
+            <p class="hint" id="tomorrow-hint"></p>
+            <div class="chk">
+                <label for="use-airlabs-api">Use AirLabs API</label>
+                <span class="switch"><input id="use-airlabs-api" type="checkbox" checked><span class="track"></span></span>
+            </div>
+            <label for="airlabs-key">AirLabs key (optional)</label>
+            <input type="password" id="airlabs-key" placeholder="API key" autocomplete="off">
+            <p class="hint" id="airlabs-hint"></p>
+            <div class="chk">
+                <label for="use-flightaware-api">Use FlightAware AeroAPI (route fallback)</label>
+                <span class="switch"><input id="use-flightaware-api" type="checkbox"><span class="track"></span></span>
+            </div>
+            <label for="flightaware-key">FlightAware AeroAPI key (optional)</label>
+            <input type="password" id="flightaware-key" placeholder="API key" autocomplete="off">
+            <p class="hint" id="flightaware-hint"></p>
+            <p class="hint">Route enrichment only when FR24/AirLabs lack origin/destination — not a live radar feed. Soft monthly spend ceiling protects free credit.</p>
+            <p class="hint" id="flightaware-usage"></p>
+            <div class="chk">
+                <label for="use-aisstream-api">Use aisstream.io API key</label>
+                <span class="switch"><input id="use-aisstream-api" type="checkbox" checked><span class="track"></span></span>
+            </div>
+            <label for="aisstream-key">aisstream.io key</label>
+            <input type="password" id="aisstream-key" placeholder="API key" autocomplete="off">
+            <p class="hint" id="aisstream-hint"></p>
+            <p class="hint">Get a free key at <a href="https://aisstream.io" target="_blank" rel="noopener">aisstream.io</a> (non-commercial).</p>
+            <label for="firms-key">NASA FIRMS MAP_KEY (wildfires outside USA/Canada)</label>
+            <input type="password" id="firms-key" placeholder="MAP_KEY" autocomplete="off">
+            <p class="hint" id="firms-hint"></p>
+            <p class="hint">Free key from <a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/" target="_blank" rel="noopener">FIRMS map key</a>. Used for satellite hotspots when the radar is outside the USA and Canada. In California: CAL FIRE; elsewhere in USA/Canada: NIFC WFIGS (no key).</p>
+            <div class="track-row" style="margin-top:.6rem">
+                <button class="btn btn-primary" id="btn-keys-save" type="button">Save keys</button>
+                <button class="btn" id="btn-keys-restart" type="button">Save &amp; restart</button>
+            </div>
+            <div id="api-keys-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card update-card">
+        <summary><span class="ico">&#8635;</span>Updates<span class="sum">version, install</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <div class="update-row">
+                <span id="update-badge" class="update-badge ok hidden">Up to date</span>
+                <span id="update-available-badge" class="update-badge hidden">Update available</span>
+            </div>
+            <p class="update-ver" id="update-local">Installed version: checking…</p>
+            <p class="update-ver" id="update-remote">Latest on GitHub: checking…</p>
+            <p class="hint" id="update-message"></p>
+            <div class="track-row" style="margin-top:.55rem">
+                <button class="btn" id="btn-check-updates" type="button">Check Updates</button>
+                <button class="btn btn-primary hidden" id="btn-update-now" type="button">Update Now</button>
+            </div>
+            <div id="updates-status" class="status"></div>
+        </div>
+    </details>
+
+    <details class="card system-card">
+        <summary><span class="ico">&#9881;</span>System<span class="sum">power</span><span class="chev">&#9656;</span></summary>
+        <div class="body">
+            <p class="hint">Relaunch the app, or restart / power off this Raspberry Pi. Reboot and shutdown take the display and portal offline.</p>
+            <div class="track-row" style="margin-top:.55rem">
+                <button class="btn btn-primary" id="btn-restart-app" type="button">Relaunch app</button>
+                <button class="btn" id="btn-reboot" type="button">Reboot</button>
+                <button class="btn btn-danger" id="btn-shutdown" type="button">Shutdown</button>
+            </div>
+            <div id="system-status" class="status"></div>
+        </div>
+    </details>
+
+    <p class="wifi-note">First-time Wi-Fi uses the on-device QR setup hotspot when no network is configured.</p>
+    <p class="foot">
+        <a href="/stats">Statistics</a> ·
+        <a href="/closest">Closest map</a> ·
+        <a href="/farthest">Farthest map</a> ·
+        <a href="/counter">Counter JSON</a>
+    </p>
+</div>
+
+<script>
+let pendingCallsign = "";
+let currentScaleIndex = 1;
+let rangePresetsMi = [2, 3, 5, 8, 10, 20, 30];
+const STATUTE_MILE_KM = 1.609344;
+const NM_PER_KM = 1 / 1.852;
+const $ = (id) => document.getElementById(id);
+
+function showStatus(id, msg, error = false) {
+    const el = $(id);
+    el.textContent = msg || "";
+    el.className = "status show" + (error ? " error" : "");
+}
+
+function clearStatus(id) {
+    const el = $(id);
+    el.textContent = "";
+    el.className = "status";
+}
+
+async function jsonFetch(url, opts = {}) {
+    const res = await fetch(url, opts);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+function applyKeyHints(keys) {
+    const map = {
+        FR24_API_KEY: "fr24-hint",
+        TOMORROW_API_KEY: "tomorrow-hint",
+        AIRLABS_API_KEY: "airlabs-hint",
+        AISSTREAM_API_KEY: "aisstream-hint",
+        FLIGHTAWARE_API_KEY: "flightaware-hint",
+        FIRMS_MAP_KEY: "firms-hint",
+    };
+    Object.entries(map).forEach(([key, id]) => {
+        const info = keys[key] || {};
+        $(id).textContent = info.configured ? `Current: ${info.masked} (${info.source})` : "Not set";
+    });
+}
+
+function rangeLabelKmForIndex(index) {
+    const idx = Math.max(0, Math.min(index, rangePresetsMi.length - 1));
+    return rangePresetsMi[idx] * STATUTE_MILE_KM;
+}
+
+function formatRangeUnit(index, units) {
+    const labelKm = rangeLabelKmForIndex(index);
+    let value;
+    if (units === "mi") value = labelKm / STATUTE_MILE_KM;
+    else if (units === "nm") value = labelKm * NM_PER_KM;
+    else value = labelKm;
+    if (units === "km" && value >= 10) return String(Math.round(value));
+    if ((units === "mi" || units === "nm") && Math.abs(value - Math.round(value)) < 0.05) {
+        return String(Math.round(value));
+    }
+    return value.toFixed(1);
+}
+
+function formatRangeOptionLabel(index) {
+    return `${formatRangeUnit(index, "mi")}mi / ${formatRangeUnit(index, "km")}km / ${formatRangeUnit(index, "nm")}nm`;
+}
+
+function populateRangeSelect(presetsMi) {
+    if (presetsMi && presetsMi.length) rangePresetsMi = presetsMi;
+    const sel = $("range_index");
+    if (!sel) return;
+    const previous = currentScaleIndex;
+    sel.innerHTML = "";
+    for (let i = 0; i < rangePresetsMi.length; i += 1) {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = formatRangeOptionLabel(i);
+        sel.appendChild(opt);
+    }
+    const maxIdx = Math.max(0, rangePresetsMi.length - 1);
+    currentScaleIndex = Math.max(0, Math.min(previous, maxIdx));
+    sel.value = String(currentScaleIndex);
+}
+
+function syncRangeSelect() {
+    const sel = $("range_index");
+    if (!sel) return;
+    const idx = Number(sel.value);
+    if (Number.isFinite(idx)) currentScaleIndex = idx;
+}
+
+let updatePollTimer = null;
+
+function formatVersionLine(prefix, info) {
+    if (!info) return `${prefix}: unavailable`;
+    if (info.release) {
+        const bits = [`${prefix}: ${info.release}`];
+        if (info.commit_short) bits.push(`(${info.commit_short})`);
+        return bits.join(" ");
+    }
+    if (!info.commit_short) return `${prefix}: unavailable`;
+    const bits = [`${prefix}: ${info.describe || info.commit_short}`];
+    if (info.branch) bits.push(`(${info.branch})`);
+    return bits.join(" ");
+}
+
+function applyUpdateInfo(data) {
+    const local = data.local || {};
+    const remote = data.remote || {};
+    const running = !!data.update_running;
+    const available = !!data.update_available && !running;
+
+    $("update-local").textContent = formatVersionLine("Installed", local);
+    if (remote.release_tag) {
+        $("update-remote").textContent =
+            `Latest release: ${remote.release_tag}${remote.commit_short ? ` (${remote.commit_short})` : ""}`;
+    } else if (remote.commit_short) {
+        $("update-remote").textContent =
+            `${formatVersionLine("Latest on GitHub", remote)}`;
+    } else {
+        $("update-remote").textContent = "Latest on GitHub: unavailable";
+    }
+
+    $("update-message").textContent = data.message || "";
+    $("update-badge").classList.toggle("hidden", available || running);
+    $("update-available-badge").classList.toggle("hidden", !available);
+    $("btn-update-now").classList.toggle("hidden", !available);
+    $("btn-check-updates").disabled = running;
+    $("btn-update-now").disabled = running;
+
+    if (running) {
+        $("update-available-badge").classList.add("hidden");
+        $("btn-update-now").classList.add("hidden");
+    }
+}
+
+async function checkUpdates() {
+    clearStatus("updates-status");
+    $("btn-check-updates").disabled = true;
+    try {
+        const data = await jsonFetch("/updates/check", { method: "POST" });
+        applyUpdateInfo(data);
+        if (data.update_running) startUpdatePoll();
+    } catch (e) {
+        showStatus("updates-status", e.message, true);
+    } finally {
+        $("btn-check-updates").disabled = false;
+    }
+}
+
+function startUpdatePoll() {
+    if (updatePollTimer) return;
+    showStatus("updates-status", "Update in progress. The page will reconnect when the service restarts…");
+    updatePollTimer = setInterval(async () => {
+        try {
+            const data = await jsonFetch("/updates/status");
+            if (!data.update_running) {
+                clearInterval(updatePollTimer);
+                updatePollTimer = null;
+                await checkUpdates();
+                showStatus("updates-status", "Update finished. Refresh if the display did not restart.");
+            }
+        } catch (_) {
+            // Service restart drops the connection — keep polling.
+        }
+    }, 4000);
+}
+
+async function applyUpdate() {
+    clearStatus("updates-status");
+    if (!confirm("Install the latest update and restart FlightScnrPi? Your settings and API keys are preserved.")) {
+        return;
+    }
+    $("btn-update-now").disabled = true;
+    try {
+        const data = await jsonFetch("/updates/apply", { method: "POST" });
+        showStatus("updates-status", data.message || "Update started.");
+        startUpdatePoll();
+        await checkUpdates();
+    } catch (e) {
+        showStatus("updates-status", e.message, true);
+        $("btn-update-now").disabled = false;
+    }
+}
+
+async function loadAll() {
+    try {
+        const loc = await jsonFetch("/location/json");
+        if (loc.location) $("radar_center").value = loc.location;
+    } catch (_) {}
+
+    try {
+        const r = await jsonFetch("/radar/json");
+        currentScaleIndex = Number(r.scale_index ?? 1);
+        $("dist_units").value = r.distance_units || "km";
+        populateRangeSelect(r.range_presets_mi);
+        $("min_height").value = String(r.min_height_ft ?? 1000);
+        $("max_height").value = String(r.max_height_ft ?? 100000);
+        const theme = $("radar_theme");
+        theme.innerHTML = "";
+        (r.theme_options || []).forEach((name, idx) => {
+            const el = document.createElement("option");
+            el.value = String(idx);
+            el.textContent = name;
+            theme.appendChild(el);
+        });
+        $("radar_theme").value = String(r.theme_index || 0);
+        if ($("map_style")) $("map_style").value = r.map_style || "dark";
+        if ($("vfr_opacity")) {
+            $("vfr_opacity").value = String(r.vfr_map_opacity ?? 45);
+            syncVfrOpacityLabel();
+        }
+        $("show_compass").checked = !!r.show_compass_rose;
+        if ($("show_range_rings")) $("show_range_rings").checked = r.show_range_rings !== false;
+        if ($("show_aircraft_tag")) $("show_aircraft_tag").checked = r.show_aircraft_tag !== false;
+        $("facing_deg").value = String(Math.round(Number(r.facing_deg) || 0) % 360);
+        $("show_sweep").checked = !!r.show_sweep_line;
+        $("show_precip").checked = r.show_precipitation !== false;
+        if ($("show_wildfires")) $("show_wildfires").checked = !!r.show_wildfires;
+        if ($("show_ground_vehicles")) $("show_ground_vehicles").checked = r.show_ground_vehicles !== false;
+        $("traffic_mode").value = r.traffic_mode || (r.ais_enabled ? "both" : "aircraft");
+    } catch (_) {}
+
+    try {
+        const d = await jsonFetch("/display/json");
+        $("bright_pct").value = String(d.brightness_percent || 100);
+        syncBrightLabel();
+        if ($("display_rotation")) {
+            const rot = [0, 90, 180, 270].includes(Number(d.display_rotation))
+                ? String(d.display_rotation)
+                : "90";
+            $("display_rotation").value = rot;
+        }
+        $("detail_timeout").value = String(d.flight_detail_timeout_s ?? 20);
+        $("clock_timeout").value = String(d.clock_timeout_s ?? 10);
+        $("idle_clock").checked = !!d.auto_idle_clock;
+    } catch (_) {}
+
+    try {
+        const o = await jsonFetch("/off-hours/json");
+        $("night_en").checked = !!o.enabled;
+        let mode = (o.mode || "dim");
+        if (mode === "clock") mode = "dim";
+        $("night_mode").value = mode;
+        $("night_start").value = o.start || "22:00";
+        $("night_end").value = o.end || "06:00";
+        $("night_dim").value = String(o.dim_percent || 20);
+        if ($("night_clock")) $("night_clock").checked = !!o.force_clock || (o.mode === "clock");
+        toggleDimRow();
+    } catch (_) {}
+
+    try {
+        const w = await jsonFetch("/weather/json");
+        $("weather_units").value = w.temperature_units || "metric";
+    } catch (_) {}
+
+    try {
+        const a = await jsonFetch("/alerts/json");
+        $("alert-mil").checked = !!a.alert_military;
+        $("alert-emrg").checked = !!a.alert_emergency;
+        $("alert-hide").checked = !!a.alert_hide_non_alerted;
+        $("alert-watch").value = a.alert_watch || "";
+        if ($("alert-watch-types")) $("alert-watch-types").value = a.alert_watch_types || "";
+    } catch (_) {}
+
+    try {
+        const t = await jsonFetch("/tracked/json");
+        $("current-tracked").textContent = t.callsign ? `Currently tracking: ${t.callsign}` : "Not currently tracking a flight.";
+    } catch (_) {}
+
+    try {
+        const keys = await jsonFetch("/api-keys/json");
+        applyKeyHints(keys);
+        const toggles = keys.toggles || {};
+        $("use-fr24-api").checked = toggles.USE_FR24_API !== false;
+        $("use-tomorrow-weather").checked = toggles.USE_TOMORROW_WEATHER !== false;
+        $("use-airlabs-api").checked = toggles.USE_AIRLABS_API !== false;
+        $("use-aisstream-api").checked = toggles.USE_AISSTREAM_API !== false;
+        if ($("use-flightaware-api")) {
+            $("use-flightaware-api").checked = !!toggles.USE_FLIGHTAWARE_API;
+        }
+        const faUsage = keys.flightaware_usage;
+        if ($("flightaware-usage") && faUsage) {
+            $("flightaware-usage").textContent =
+                `FlightAware this month: $${Number(faUsage.spend_usd || 0).toFixed(2)} / $${Number(faUsage.monthly_limit_usd || 4.5).toFixed(2)} (${faUsage.calls || 0} calls)`;
+        }
+        const d1090 = keys.dump1090 || {};
+        if ($("dump1090_enabled")) $("dump1090_enabled").checked = !!d1090.DUMP1090_ENABLED;
+        if ($("dump1090_url")) {
+            $("dump1090_url").value = d1090.DUMP1090_URL
+                || "http://127.0.0.1:8080/data/aircraft.json";
+        }
+    } catch (_) {}
+}
+
+function toggleDimRow() {
+    $("dim-row").style.display = $("night_mode").value === "dim" ? "block" : "none";
+}
+
+function syncBrightLabel() {
+    const el = $("bright_pct_label");
+    if (el) el.textContent = `${$("bright_pct").value}%`;
+}
+
+function syncVfrOpacityLabel() {
+    const el = $("vfr_opacity_label");
+    if (el && $("vfr_opacity")) el.textContent = `${$("vfr_opacity").value}%`;
+}
+
+async function saveRadar() {
+    clearStatus("radar-status");
+    try {
+        const data = await jsonFetch("/location/set", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ location: $("radar_center").value.trim() }),
+        });
+        $("radar_center").value = data.location || $("radar_center").value;
+        await jsonFetch("/radar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                distance_units: $("dist_units").value,
+                scale_index: Number($("range_index").value),
+                min_height_ft: Number($("min_height").value),
+                max_height_ft: Number($("max_height").value),
+                theme_index: Number($("radar_theme").value),
+                show_compass_rose: $("show_compass").checked,
+                show_range_rings: $("show_range_rings") ? $("show_range_rings").checked : true,
+                show_aircraft_tag: $("show_aircraft_tag").checked,
+                facing_deg: Number($("facing_deg").value),
+                show_sweep_line: $("show_sweep").checked,
+                show_precipitation: $("show_precip").checked,
+                show_wildfires: $("show_wildfires") ? $("show_wildfires").checked : false,
+                show_ground_vehicles: $("show_ground_vehicles") ? $("show_ground_vehicles").checked : true,
+                map_style: $("map_style").value,
+                vfr_map_opacity: Number($("vfr_opacity") ? $("vfr_opacity").value : 45),
+                traffic_mode: $("traffic_mode").value,
+            }),
+        });
+        showStatus("radar-status", "Radar settings saved.");
+        await loadAll();
+    } catch (e) {
+        showStatus("radar-status", e.message, true);
+    }
+}
+
+async function saveDump1090() {
+    clearStatus("dump1090-status");
+    try {
+        const enabled = $("dump1090_enabled") ? $("dump1090_enabled").checked : false;
+        const url = $("dump1090_url") ? $("dump1090_url").value.trim() : "";
+        await jsonFetch("/api-keys", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                dump1090_enabled: enabled,
+                dump1090_url: url,
+            }),
+        });
+        showStatus(
+            "dump1090-status",
+            enabled
+                ? "Local ADS-B saved — display picks it up on the next data cycle."
+                : "Local ADS-B disabled."
+        );
+        await loadAll();
+    } catch (e) {
+        showStatus("dump1090-status", e.message, true);
+    }
+}
+
+async function saveDisplay() {
+    clearStatus("display-status");
+    try {
+        const data = await jsonFetch("/display", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                brightness_percent: Number($("bright_pct").value),
+                display_rotation: Number($("display_rotation") ? $("display_rotation").value : 90),
+                flight_detail_timeout_s: Number($("detail_timeout").value),
+                clock_timeout_s: Number($("clock_timeout").value),
+                auto_idle_clock: $("idle_clock").checked,
+            }),
+        });
+        showStatus("display-status", data.message || "Display settings saved.");
+    } catch (e) {
+        showStatus("display-status", e.message, true);
+    }
+}
+
+async function saveAndReloadSettings() {
+    clearStatus("display-status");
+    try {
+        await jsonFetch("/radar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                distance_units: $("dist_units").value,
+                scale_index: Number($("range_index").value),
+                min_height_ft: Number($("min_height").value),
+                max_height_ft: Number($("max_height").value),
+                theme_index: Number($("radar_theme").value),
+                show_compass_rose: $("show_compass").checked,
+                show_range_rings: $("show_range_rings") ? $("show_range_rings").checked : true,
+                show_aircraft_tag: $("show_aircraft_tag").checked,
+                facing_deg: Number($("facing_deg").value),
+                show_sweep_line: $("show_sweep").checked,
+                show_precipitation: $("show_precip").checked,
+                show_wildfires: $("show_wildfires") ? $("show_wildfires").checked : false,
+                show_ground_vehicles: $("show_ground_vehicles") ? $("show_ground_vehicles").checked : true,
+                map_style: $("map_style").value,
+                vfr_map_opacity: Number($("vfr_opacity") ? $("vfr_opacity").value : 45),
+                traffic_mode: $("traffic_mode").value,
+            }),
+        });
+        await jsonFetch("/display", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                brightness_percent: Number($("bright_pct").value),
+                display_rotation: Number($("display_rotation") ? $("display_rotation").value : 90),
+                flight_detail_timeout_s: Number($("detail_timeout").value),
+                clock_timeout_s: Number($("clock_timeout").value),
+                auto_idle_clock: $("idle_clock").checked,
+            }),
+        });
+        const loc = ($("radar_center").value || "").trim();
+        if (loc) {
+            await jsonFetch("/location/set", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ location: loc }),
+            });
+        }
+        const data = await jsonFetch("/settings/reload", { method: "POST" });
+        showStatus(
+            "display-status",
+            data.message || "Settings saved; display will reload shortly."
+        );
+        await loadAll();
+    } catch (e) {
+        showStatus("display-status", e.message, true);
+    }
+}
+
+async function saveOffHours() {
+    clearStatus("offhours-status");
+    try {
+        const data = await jsonFetch("/off-hours", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                enabled: $("night_en").checked,
+                mode: $("night_mode").value,
+                force_clock: $("night_clock") ? $("night_clock").checked : false,
+                start: $("night_start").value,
+                end: $("night_end").value,
+                dim_percent: Number($("night_dim").value),
+            }),
+        });
+        showStatus("offhours-status", data.message || "Off-hours saved.");
+    } catch (e) {
+        showStatus("offhours-status", e.message, true);
+    }
+}
+
+async function saveWeather() {
+    clearStatus("weather-status");
+    try {
+        const data = await jsonFetch("/weather", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ temperature_units: $("weather_units").value }),
+        });
+        showStatus("weather-status", data.message || "Weather settings saved.");
+    } catch (e) {
+        showStatus("weather-status", e.message, true);
+    }
+}
+
+async function saveAlerts() {
+    clearStatus("alert-status");
+    try {
+        await jsonFetch("/alerts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                alert_military: $("alert-mil").checked,
+                alert_emergency: $("alert-emrg").checked,
+                alert_hide_non_alerted: $("alert-hide").checked,
+                alert_watch: $("alert-watch").value.trim().toUpperCase(),
+                alert_watch_types: ($("alert-watch-types") ? $("alert-watch-types").value : "").trim().toUpperCase(),
+            }),
+        });
+        showStatus("alert-status", "Alert settings saved.");
+    } catch (e) {
+        showStatus("alert-status", e.message, true);
+    }
+}
+
+async function saveApiKeys(restart) {
+    clearStatus("api-keys-status");
+    try {
+        const data = await jsonFetch("/api-keys", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                fr24_api_key: $("fr24-key").value,
+                tomorrow_api_key: $("tomorrow-key").value,
+                airlabs_api_key: $("airlabs-key").value,
+                aisstream_api_key: $("aisstream-key").value,
+                flightaware_api_key: $("flightaware-key") ? $("flightaware-key").value : "",
+                firms_map_key: $("firms-key") ? $("firms-key").value : "",
+                use_fr24_api: $("use-fr24-api").checked,
+                use_tomorrow_weather: $("use-tomorrow-weather").checked,
+                use_airlabs_api: $("use-airlabs-api").checked,
+                use_aisstream_api: $("use-aisstream-api").checked,
+                use_flightaware_api: $("use-flightaware-api") ? $("use-flightaware-api").checked : false,
+                restart: !!restart,
+            }),
+        });
+        $("fr24-key").value = "";
+        $("tomorrow-key").value = "";
+        $("airlabs-key").value = "";
+        $("aisstream-key").value = "";
+        if ($("flightaware-key")) $("flightaware-key").value = "";
+        if ($("firms-key")) $("firms-key").value = "";
+        if (data.keys) applyKeyHints(data.keys);
+        showStatus("api-keys-status", data.message || "API keys saved.");
+    } catch (e) {
+        showStatus("api-keys-status", e.message, true);
+    }
+}
+
+function setTrackStatus(msg, error = false) {
+    showStatus("track-status", msg, error);
+}
+
+function showConfirm(show) {
+    $("confirm-row").classList.toggle("hidden", !show);
+}
+
+async function saveTracked(callsign) {
+    await jsonFetch("/tracked/set", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callsign }),
+    });
+    $("current-tracked").textContent = callsign ? `Currently tracking: ${callsign}` : "Not currently tracking a flight.";
+}
+
+async function lookupAndTrack() {
+    const callsign = $("callsign-input").value.trim().toUpperCase();
+    if (!callsign) return;
+    showConfirm(false);
+    setTrackStatus("Looking up live flight...");
+    try {
+        const data = await jsonFetch("/tracked/lookup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ callsign }),
+        });
+        if (data.found) {
+            await saveTracked(data.track_as || data.callsign || callsign);
+            setTrackStatus(`Saved: ${data.summary || callsign}`);
+            $("callsign-input").value = "";
+            return;
+        }
+        pendingCallsign = callsign;
+        setTrackStatus(`Flight not found now. Save anyway to track when it goes live?`);
+        showConfirm(true);
+    } catch (e) {
+        setTrackStatus(e.message, true);
+    }
+}
+
+async function clearTracked() {
+    try {
+        await saveTracked("");
+        $("callsign-input").value = "";
+        showConfirm(false);
+        setTrackStatus("Tracking cleared.");
+    } catch (e) {
+        setTrackStatus(e.message, true);
+    }
+}
+
+async function saveAnyway() {
+    if (!pendingCallsign) return;
+    try {
+        await saveTracked(pendingCallsign);
+        $("callsign-input").value = "";
+        showConfirm(false);
+        setTrackStatus(`Saved ${pendingCallsign}.`);
+        pendingCallsign = "";
+    } catch (e) {
+        setTrackStatus(e.message, true);
+    }
+}
+
+function cancelSave() {
+    pendingCallsign = "";
+    showConfirm(false);
+    clearStatus("track-status");
+}
+
+async function searchRoute() {
+    const origin = $("origin-input").value.trim().toUpperCase();
+    const destination = $("dest-input").value.trim().toUpperCase();
+    if (!origin || !destination) return;
+    $("route-results").textContent = "Searching...";
+    try {
+        const data = await jsonFetch("/route/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ origin, destination }),
+        });
+        const flights = data.flights || [];
+        if (!flights.length) {
+            $("route-results").textContent = "No live flights found.";
+            return;
+        }
+        $("route-results").innerHTML = flights.slice(0, 12).map((f) => {
+            const alt = Number(f.altitude || 0);
+            const altLabel = alt >= 18000 ? `FL${Math.round(alt / 100)}` : `${alt.toLocaleString()}ft`;
+            return `${f.callsign} — ${f.aircraft || "?"} — ${altLabel} — ${Math.round(Number(f.speed || 0))}kts`;
+        }).join("<br>");
+    } catch (e) {
+        $("route-results").textContent = e.message;
+    }
+}
+
+async function requestSystemAction(action) {
+    const labels = { reboot: "reboot", shutdown: "shut down" };
+    const label = labels[action] || action;
+    if (!confirm(`Are you sure you want to ${label} this Raspberry Pi?`)) {
+        return;
+    }
+    clearStatus("system-status");
+    setSystemButtonsDisabled(true);
+    try {
+        const data = await jsonFetch(`/system/${action}`, { method: "POST" });
+        showStatus("system-status", data.message || `${label} scheduled.`);
+    } catch (e) {
+        showStatus("system-status", e.message, true);
+        setSystemButtonsDisabled(false);
+    }
+}
+
+function setSystemButtonsDisabled(disabled) {
+    $("btn-restart-app").disabled = disabled;
+    $("btn-reboot").disabled = disabled;
+    $("btn-shutdown").disabled = disabled;
+}
+
+async function requestAppRestart() {
+    if (!confirm("Relaunch FlightScnr? The display and portal will reconnect in a few seconds.")) {
+        return;
+    }
+    clearStatus("system-status");
+    setSystemButtonsDisabled(true);
+    try {
+        const data = await jsonFetch("/system/restart-app", { method: "POST" });
+        showStatus("system-status", data.message || "FlightScnr is restarting…");
+    } catch (e) {
+        showStatus("system-status", e.message, true);
+        setSystemButtonsDisabled(false);
+    }
+}
+
+$("btn-check-updates").addEventListener("click", checkUpdates);
+$("btn-update-now").addEventListener("click", applyUpdate);
+$("btn-restart-app").addEventListener("click", requestAppRestart);
+$("btn-reboot").addEventListener("click", () => requestSystemAction("reboot"));
+$("btn-shutdown").addEventListener("click", () => requestSystemAction("shutdown"));
+$("btn-radar").addEventListener("click", saveRadar);
+$("btn-dump1090").addEventListener("click", saveDump1090);
+$("btn-display").addEventListener("click", saveDisplay);
+$("btn-save-reload").addEventListener("click", saveAndReloadSettings);
+$("btn-offhours").addEventListener("click", saveOffHours);
+$("btn-weather").addEventListener("click", saveWeather);
+$("btn-alerts").addEventListener("click", saveAlerts);
+$("btn-track").addEventListener("click", lookupAndTrack);
+$("btn-clear-track").addEventListener("click", clearTracked);
+$("btn-save-anyway").addEventListener("click", saveAnyway);
+$("btn-cancel-save").addEventListener("click", cancelSave);
+$("btn-route").addEventListener("click", searchRoute);
+$("btn-keys-save").addEventListener("click", () => saveApiKeys(false));
+$("btn-keys-restart").addEventListener("click", () => saveApiKeys(true));
+$("night_mode").addEventListener("change", toggleDimRow);
+$("range_index").addEventListener("change", syncRangeSelect);
+$("bright_pct").addEventListener("input", syncBrightLabel);
+if ($("vfr_opacity")) $("vfr_opacity").addEventListener("input", syncVfrOpacityLabel);
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadAll();
+    checkUpdates();
+});
+</script>
+</body>
+</html>
