@@ -65,6 +65,8 @@ jobs:
       - name: Build Android APK (Debug)
         run: |
           # Buildozer needs a non-root environment or explicit permission
+          # Disable pipefail so SIGPIPE (broken pipe) from yes does not cause the build step to fail
+          set +o pipefail
           yes | buildozer -v android debug
 
       - name: Upload APK Artifact
