@@ -28,7 +28,7 @@ version = 1.0.0
 # If grpcio causes cross-compilation errors on your build environment, you can remove
 # grpcio, protobuf, and fr24 from requirements, and FlightScnr will automatically
 # run in adsb.fi-only mode.
-requirements = python3,pygame,requests,urllib3,certifi,idna,charset-normalizer,qrcode,pillow,websockets,python-dotenv,flask,jinja2,click,werkzeug,itsdangerous,blinker,xyzservices,branca,folium
+requirements = python3==3.10.12,hostpython3==3.10.12,pygame,requests,urllib3,certifi,idna,charset-normalizer,qrcode,pillow,websockets,python-dotenv,flask,jinja2,click,werkzeug,itsdangerous,blinker,xyzservices,branca,folium
 
 # (str) Supported orientations (one of portrait, landscape, sensorPortrait, sensorLandscape or all)
 orientation = all
